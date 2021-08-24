@@ -22,13 +22,7 @@ void Robot1PoseSub(const brl_msgs::brl_msgs::ConstPtr &odom){
     Turtle_odom1.posx = odom->posx;
     Turtle_odom1.posy = odom->posy;
     Turtle_odom1.yaw = odom->yaw;
-//  Turtle_odom1.pose.pose.position.x = odom->posx;
-//  Turtle_odom1.pose.pose.position.y = odom->posy;
-//  Turtle_odom1.pose.pose.orientation.x = odom->yaw;
-//  Turtle_odom1.pose.pose.orientation.y = odom->oriy;
-//  Turtle_odom1.pose.pose.orientation.z = odom->oriz;
-//  Turtle_odom1.pose.pose.orientation.w = odom->oriw;
-  cout<<"1."<<"x.."<<odom->posx<<"y.."<<odom->posy<<endl;
+//  cout<<"1."<<"x.."<<odom->posx<<"y.."<<odom->posy<<endl;
 }
 
 
@@ -58,11 +52,10 @@ namespace gazebo
 //      Turtle_pose.pos.z = cur_pose.pos.z;
 //      math::Vector3 rpy;
 //      rpy.z = Turtle_odom1.yaw;
+
+
+//      Turtle_pose.Set(Turtle_odom1.posx,Turtle_odom1.posy,0,0,0,0);
       Turtle_pose.Set(Turtle_odom1.posx,Turtle_odom1.posy,0,0,0,Turtle_odom1.yaw);
-//      Turtle_pose.rot.x = Turtle_odom1.pose.pose.orientation.x;
-//      Turtle_pose.rot.y = Turtle_odom1.pose.pose.orientation.y;
-//      Turtle_pose.rot.z = Turtle_odom1.pose.pose.orientation.z;
-//      Turtle_pose.rot.w = Turtle_odom1.pose.pose.orientation.w;
 
       math::Vector3 linVel, angVel;
       linVel.x = 0;

@@ -161,7 +161,7 @@ private:
     }
     accept_session();
   }
-  int m_session_num void= 0;
+  int m_session_num = 0;
   boost::asio::io_service& io_service_;
   tcp::acceptor acceptor_;
   Session* m_pSession;
@@ -182,11 +182,13 @@ int main(int argc, char* argv[])
 
   Packet_t pk[SESSION_NUM];
   Eigen::MatrixXf L(SESSION_NUM, SESSION_NUM);
-  L<<1, 0, -1,
-      -1, 1, 0,
-      0, -1, 1;
+  L<<2, -1, -1,
+      -1, 2, -1,
+      -1, -1, 2;
   Eigen::MatrixXf z_ix(SESSION_NUM,1);
   Eigen::MatrixXf z_iy(SESSION_NUM,1);
+  Eigen::MatrixXf zdot_ix(SESSION_NUM,1);
+  Eigen::MatrixXf zdot_iy(SESSION_NUM,1);
 
   brl_msgs::brl_msgs tb1_odom;
   brl_msgs::brl_msgs tb2_odom;
@@ -198,14 +200,10 @@ int main(int argc, char* argv[])
         // GET PACKET //
         for(int i = 0; i < s.get_session_num()-1; i++){
           pk[i] = g_mpSessionIDs[i]->get_Packet();
-          cout<<i<<": "<<pk[i].stData.z_x<<","<<pk[i].stData.z_y<<endl;
+          cout<<i<<"zx: "<<pk[i].stData.z_x<<",zy"<<pk[i].stData.z_y<<endl;
+          cout<<"dx:"<<pk[i].stData.d_x<<",\t"<<"dy:"<<pk[i].stData.d_y<<",\t yaw"<<pk[i].stData.yaw<<endl;
         }
-        // Exchange with Laplacian //
-        z_ix << pk[0].stData.z_x,pk[1].stData.z_x,pk[2].stData.z_x;
-        z_iy << pk[0].stData.z_y,pk[1].stData.z_y,pk[2].stData.z_y;
-        z_ix = L*z_ix;
-        z_iy = L*z_iy;
-
+        cout<<"---------------------------------"<<endl;
         // Draw Turtlebot IN Gazebo //
         tb1_odom.posx = pk[0].stData.z_x + pk[0].stData.d_x;;
         tb1_odom.posy = pk[0].stData.z_y + pk[0].stData.d_y;;
@@ -223,10 +221,16 @@ int main(int argc, char* argv[])
         Tb2_pub.publish(tb2_odom);
         Tb3_pub.publish(tb3_odom);
 
+        // Exchange with Laplacian //
+        z_ix << pk[0].stData.z_x,pk[1].stData.z_x,pk[2].stData.z_x;
+        z_iy << pk[0].stData.z_y,pk[1].stData.z_y,pk[2].stData.z_y;
+        zdot_ix = L*z_ix;
+        zdot_iy = L*z_iy;
+
         // SET PACKET //
         for(int i = 0; i < s.get_session_num()-1; i++){
-          pk[i].stData.z_x = z_ix(i);
-          pk[i].stData.z_y = z_iy(i);
+          pk[i].stData.z_x = zdot_ix(i);
+          pk[i].stData.z_y = zdot_iy(i);
           g_mpSessionIDs[i]->set_Packet(pk[i]);
         }
     }

@@ -22,10 +22,7 @@ void Robot3PoseSub(const brl_msgs::brl_msgs::ConstPtr &odom){
   Turtle_odom3.posx = odom->posx;
   Turtle_odom3.posy = odom->posy;
   Turtle_odom3.yaw = odom->yaw;
-//  Turtle_odom2.pose.pose.orientation.y = odom->oriy;
-//  Turtle_odom2.pose.pose.orientation.z = odom->oriz;
-//  Turtle_odom2.pose.pose.orientation.w = odom->oriw;
-  cout<<"3."<<"x.."<<odom->posx<<"y.."<<odom->posy<<endl;
+//  cout<<"3."<<"x.."<<odom->posx<<"y.."<<odom->posy<<endl;
 }
 
 
@@ -49,7 +46,7 @@ namespace gazebo
     {
       math::Pose cur_pose= this->model->GetWorldPose();
       Turtle_pose.Set(Turtle_odom3.posx,Turtle_odom3.posy,0,0,0,Turtle_odom3.yaw);
-
+//      Turtle_pose.Set(Turtle_odom3.posx,Turtle_odom3.posy,0,0,0,0);
 
       math::Vector3 linVel, angVel;
       linVel.x = 0;
