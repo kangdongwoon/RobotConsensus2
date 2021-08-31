@@ -22,7 +22,6 @@ void Robot2PoseSub(const brl_msgs::brl_msgs::ConstPtr &odom){
   Turtle_odom2.posx = odom->posx;
   Turtle_odom2.posy = odom->posy;
   Turtle_odom2.yaw = odom->yaw;
-//  cout<<"2."<<"x.."<<odom->posx<<"y.."<<odom->posy<<endl;
 }
 
 
@@ -46,7 +45,6 @@ namespace gazebo
     {
       math::Pose cur_pose= this->model->GetWorldPose();
       Turtle_pose.Set(Turtle_odom2.posx,Turtle_odom2.posy,0,0,0,Turtle_odom2.yaw);
-//      Turtle_pose.Set(Turtle_odom2.posx,Turtle_odom2.posy,0,0,0,0);
 
 
       math::Vector3 linVel, angVel;
@@ -59,15 +57,6 @@ namespace gazebo
 
       this->model->SetWorldPose(Turtle_pose);
       this->model->SetWorldTwist(linVel, angVel);
-//      err_position = des_position - Turtle_odom2.pose.pose.position.x;
-
-      //cout<<"err: "<<err_position<<endl;
-
-//      Turtle_twist[2].linear.x = -1.0 * err_position; //- 0.6 *(err_position-preerr_position);
-      //cout<<"lin_vel: "<<Turtle_twist[2].linear.x;
-      //Robot2Pub.publish(Turtle_twist[2]);
-      // Send cmd_vel 2 Real Turtlebot
-//      preerr_position =err_position;
     }
 
     // Pointer to the model
@@ -81,13 +70,7 @@ namespace gazebo
 
     public:
       ros::NodeHandle nh;
-//      ros::Subscriber Robot0Pose;
-//      ros::Subscriber Robot1Pose;
-//      ros::Subscriber Robot2Pose;
       ros::Subscriber RobotPose;
-      //ros::Publisher Robot0Pub;
-      //ros::Publisher Robot1Pub;
-      //ros::Publisher Robot2Pub;
 
   };
 

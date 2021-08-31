@@ -11,7 +11,6 @@
 using namespace std;
 
 //Global Variables
-//nav_msgs::Odometry Turtle_odom1;
 brl_msgs::brl_msgs Turtle_odom1;
 geometry_msgs::Twist Turtle_twist[3];
 static double des_position = 0.2;
@@ -22,9 +21,7 @@ void Robot1PoseSub(const brl_msgs::brl_msgs::ConstPtr &odom){
     Turtle_odom1.posx = odom->posx;
     Turtle_odom1.posy = odom->posy;
     Turtle_odom1.yaw = odom->yaw;
-//  cout<<"1."<<"x.."<<odom->posx<<"y.."<<odom->posy<<endl;
 }
-
 
 namespace gazebo
 {
@@ -45,16 +42,8 @@ namespace gazebo
     public: void OnUpdate()
     {
       // Apply a small linear velocity to the model.
-      // this->model->SetLinearVel(ignition::math::Vector3d(.3, 0, 0));
       math::Pose cur_pose= this->model->GetWorldPose();
-//      Turtle_pose.pos.x = Turtle_odom1.posx;
-//      Turtle_pose.pos.y =-Turtle_odom1.posy;
-//      Turtle_pose.pos.z = cur_pose.pos.z;
-//      math::Vector3 rpy;
-//      rpy.z = Turtle_odom1.yaw;
 
-
-//      Turtle_pose.Set(Turtle_odom1.posx,Turtle_odom1.posy,0,0,0,0);
       Turtle_pose.Set(Turtle_odom1.posx,Turtle_odom1.posy,0,0,0,Turtle_odom1.yaw);
 
       math::Vector3 linVel, angVel;
@@ -66,15 +55,6 @@ namespace gazebo
       angVel.z = 0;
       this->model->SetWorldPose(Turtle_pose);
       this->model->SetWorldTwist(linVel, angVel);
-//      err_position = des_position - Turtle_odom1.pose.pose.position.x;
-
-      //cout<<"err: "<<err_position<<endl;
-
-//      Turtle_twist[2].linear.x = -1.0 * err_position; //- 0.6 *(err_position-preerr_position);
-      //cout<<"lin_vel: "<<Turtle_twist[2].linear.x;
-      //Robot2Pub.publish(Turtle_twist[2]);
-      // Send cmd_vel 2 Real Turtlebot
-//      preerr_position =err_position;
     }
 
     // Pointer to the model
@@ -88,13 +68,7 @@ namespace gazebo
 
     public:
       ros::NodeHandle nh;
-//      ros::Subscriber Robot0Pose;
-//      ros::Subscriber Robot1Pose;
-//      ros::Subscriber Robot2Pose;
       ros::Subscriber RobotPose;
-      //ros::Publisher Robot0Pub;
-      //ros::Publisher Robot1Pub;
-      //ros::Publisher Robot2Pub;
 
   };
 
