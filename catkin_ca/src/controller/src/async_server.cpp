@@ -15,7 +15,7 @@
 using boost::asio::ip::tcp;
 using namespace std;
 
-#define SESSION_NUM 3
+#define SESSION_NUM 4
 class Session;
 std::map<int, Session*> g_mpSessionIDs;
 static int g_exchange = 0;
@@ -116,7 +116,7 @@ private:
   tcp::socket m_Socket;
   Packet_t m_uSendPacket;
   Packet_t m_uPacketBuffer;
-  unsigned char m_Buf[256],m_BufWriteCnt =0, m_BufReadCnt =0;
+  unsigned char m_Buf[256], m_BufWriteCnt =0, m_BufReadCnt =0;
   unsigned char m_PacketMode = 0;
   int m_readSize =0, m_checkSize=0;
   unsigned char m_check=0;
@@ -172,6 +172,7 @@ int main(int argc, char* argv[])
 {
   ros::init(argc, argv, "async_server");
   ros::NodeHandle nh;
+  ros::Publisher Tb0_pub = nh.advertise<brl_msgs::brl_msgs>("/tb_0/odom",10);
   ros::Publisher Tb1_pub = nh.advertise<brl_msgs::brl_msgs>("/tb_1/odom",10);
   ros::Publisher Tb2_pub = nh.advertise<brl_msgs::brl_msgs>("/tb_2/odom",10);
   ros::Publisher Tb3_pub = nh.advertise<brl_msgs::brl_msgs>("/tb_3/odom",10);
@@ -182,17 +183,20 @@ int main(int argc, char* argv[])
 
   Packet_t pk[SESSION_NUM];
   Eigen::MatrixXf L(SESSION_NUM, SESSION_NUM);
-  L<<2, -1, -1,
-      -1, 2, -1,
-      -1, -1, 2;
+  L<< 3,    -1,     -1,     -1,
+     -1,    3,      -1,     -1,
+     -1,    -1,     3,      -1,
+     -1,    -1,     -1,     3;
   Eigen::MatrixXf z_ix(SESSION_NUM,1);
   Eigen::MatrixXf z_iy(SESSION_NUM,1);
   Eigen::MatrixXf zdot_ix(SESSION_NUM,1);
   Eigen::MatrixXf zdot_iy(SESSION_NUM,1);
 
+  brl_msgs::brl_msgs tb0_odom;
   brl_msgs::brl_msgs tb1_odom;
   brl_msgs::brl_msgs tb2_odom;
   brl_msgs::brl_msgs tb3_odom;
+
   while(ros::ok()){
     io_service.poll();
 
@@ -205,25 +209,30 @@ int main(int argc, char* argv[])
         }
         cout<<"---------------------------------"<<endl;
         // Draw Turtlebot IN Gazebo //
-        tb1_odom.posx = pk[0].stData.z_x + pk[0].stData.d_x;;
-        tb1_odom.posy = pk[0].stData.z_y + pk[0].stData.d_y;;
-        tb1_odom.yaw  = pk[0].stData.yaw;
+        tb0_odom.posx = pk[0].stData.z_x + pk[0].stData.d_x;;
+        tb0_odom.posy = pk[0].stData.z_y + pk[0].stData.d_y;;
+        tb0_odom.yaw  = pk[0].stData.yaw;
 
-        tb2_odom.posx = pk[1].stData.z_x + pk[1].stData.d_x;
-        tb2_odom.posy = pk[1].stData.z_y + pk[1].stData.d_y;
-        tb2_odom.yaw  = pk[1].stData.yaw;
+        tb1_odom.posx = pk[1].stData.z_x + pk[1].stData.d_x;;
+        tb1_odom.posy = pk[1].stData.z_y + pk[1].stData.d_y;;
+        tb1_odom.yaw  = pk[1].stData.yaw;
 
-        tb3_odom.posx = pk[2].stData.z_x + pk[2].stData.d_x;;
-        tb3_odom.posy = pk[2].stData.z_y + pk[2].stData.d_y;;
-        tb3_odom.yaw  = pk[2].stData.yaw;
+        tb2_odom.posx = pk[2].stData.z_x + pk[2].stData.d_x;
+        tb2_odom.posy = pk[2].stData.z_y + pk[2].stData.d_y;
+        tb2_odom.yaw  = pk[2].stData.yaw;
 
+        tb3_odom.posx = pk[3].stData.z_x + pk[3].stData.d_x;;
+        tb3_odom.posy = pk[3].stData.z_y + pk[3].stData.d_y;;
+        tb3_odom.yaw  = pk[3].stData.yaw;
+
+        Tb0_pub.publish(tb0_odom);
         Tb1_pub.publish(tb1_odom);
         Tb2_pub.publish(tb2_odom);
         Tb3_pub.publish(tb3_odom);
 
         // Exchange with Laplacian //
-        z_ix << pk[0].stData.z_x,pk[1].stData.z_x,pk[2].stData.z_x;
-        z_iy << pk[0].stData.z_y,pk[1].stData.z_y,pk[2].stData.z_y;
+        z_ix << pk[0].stData.z_x,pk[1].stData.z_x,pk[2].stData.z_x,pk[3].stData.z_x;
+        z_iy << pk[0].stData.z_y,pk[1].stData.z_y,pk[2].stData.z_y,pk[3].stData.z_y;
         zdot_ix = L*z_ix;
         zdot_iy = L*z_iy;
 
