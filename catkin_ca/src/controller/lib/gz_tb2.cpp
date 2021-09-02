@@ -7,6 +7,7 @@
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Twist.h>
 
+#include <ignition/math.hh>
 #include <brl_msgs/brl_msgs.h>
 using namespace std;
 
@@ -19,9 +20,9 @@ static double err_position = 0;
 static double preerr_position = 0;
 
 void Robot2PoseSub(const brl_msgs::brl_msgs::ConstPtr &odom){
-  Turtle_odom2.posx = odom->posx;
-  Turtle_odom2.posy = odom->posy;
-  Turtle_odom2.yaw = odom->yaw;
+    Turtle_odom2.posx = odom->posx;
+    Turtle_odom2.posy = odom->posy;
+    Turtle_odom2.yaw = odom->yaw;
 }
 
 
@@ -43,17 +44,17 @@ namespace gazebo
     // Called by the world update start event
     public: void OnUpdate()
     {
-      math::Pose cur_pose= this->model->GetWorldPose();
+      ignition::math::Pose3d cur_pose= this->model->WorldPose();
       Turtle_pose.Set(Turtle_odom2.posx,Turtle_odom2.posy,0,0,0,Turtle_odom2.yaw);
 
 
-      math::Vector3 linVel, angVel;
-      linVel.x = 0;
-      linVel.y = 0;
-      linVel.z = 0;
-      angVel.x = 0;
-      angVel.y = 0;
-      angVel.z = 0;
+      ignition::math::Vector3d linVel, angVel;
+      linVel.X(0);
+      linVel.Y(0);
+      linVel.Z(0);
+      angVel.X(0);
+      angVel.Y(0);
+      angVel.Z(0);
 
       this->model->SetWorldPose(Turtle_pose);
       this->model->SetWorldTwist(linVel, angVel);
@@ -66,7 +67,7 @@ namespace gazebo
     private: event::ConnectionPtr updateConnection;
 
     private:
-      math::Pose Turtle_pose;
+      ignition::math::Pose3d Turtle_pose;
 
     public:
       ros::NodeHandle nh;
