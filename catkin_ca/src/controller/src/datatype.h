@@ -10,7 +10,7 @@ typedef struct _packet_data{
     float d_x; //orix
     float d_y; //oriy
     float yaw; //oriz
-//    float oriw;
+    float gainK;
 }Packet_data_t;
 
 typedef union _packet {

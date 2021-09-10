@@ -19,6 +19,10 @@ using namespace std;
 class Session;
 std::map<int, Session*> g_mpSessionIDs;
 static int g_exchange = 0;
+static float g_leader_theta = 0;
+static float g_gainK = 1;
+static unsigned char g_mode = 0;
+
 class Session
 {
 public:
@@ -48,8 +52,10 @@ public:
     if(g_exchange == 1){
       m_uSendPacket.stData.header[0]=m_uSendPacket.stData.header[1]=m_uSendPacket.stData.header[2]=m_uSendPacket.stData.header[3]=0xFE;
     }
-    m_uSendPacket.stData.yaw = m_uSendPacket.stData.d_x = m_uSendPacket.stData.d_y = 0;
-    m_uSendPacket.stData.mode = 3;
+    m_uSendPacket.stData.d_x = m_uSendPacket.stData.d_y = 0;
+    m_uSendPacket.stData.yaw = g_leader_theta;
+    m_uSendPacket.stData.mode = g_mode;
+    m_uSendPacket.stData.gainK = g_gainK;
     m_uSendPacket.stData.check = 0;
 
     for(int i=8; i<sizeof(Packet_t); i++){
@@ -206,6 +212,12 @@ int main(int argc, char* argv[])
           pk[i] = g_mpSessionIDs[i]->get_Packet();
           cout<<i<<"zx: "<<pk[i].stData.z_x<<",zy"<<pk[i].stData.z_y<<endl;
           cout<<"dx:"<<pk[i].stData.d_x<<",\t"<<"dy:"<<pk[i].stData.d_y<<",\t yaw"<<pk[i].stData.yaw<<endl;
+
+          if(pk[i].stData.id == 1){ // leader
+              g_mode = pk[i].stData.mode;
+              g_gainK = pk[i].stData.gainK;
+              g_leader_theta = pk[i].stData.yaw;
+          }
         }
         cout<<"---------------------------------"<<endl;
         // Draw Turtlebot IN Gazebo //

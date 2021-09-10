@@ -140,6 +140,9 @@ list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 add_library(model_push
     lib/model_push.cpp
 )
+add_library(gz_tb0
+    lib/gz_tb0.cpp
+)
 add_library(gz_tb1
     lib/gz_tb1.cpp
 )
@@ -183,6 +186,9 @@ target_link_libraries(async_server
   ${Eigen_LIBRARIES}
 )
 target_link_libraries(model_push
+  ${GAZEBO_LIBRARIES}
+)
+target_link_libraries(gz_tb0
   ${GAZEBO_LIBRARIES}
 )
 target_link_libraries(gz_tb1
