@@ -11,6 +11,8 @@
 #include <eigen3/Eigen/Eigen>
 
 #include <brl_msgs/brl_msgs.h>
+#include <fstream>
+#include <iostream>
 
 using boost::asio::ip::tcp;
 using namespace std;
@@ -22,6 +24,8 @@ static int g_exchange = 0;
 static float g_leader_theta = 0;
 static float g_gainK = 1;
 static unsigned char g_mode = 0;
+string filePath = "xy.txt";
+ofstream writeFile(filePath.data());
 
 class Session
 {
@@ -202,7 +206,9 @@ int main(int argc, char* argv[])
   brl_msgs::brl_msgs tb1_odom;
   brl_msgs::brl_msgs tb2_odom;
   brl_msgs::brl_msgs tb3_odom;
-
+  double default_secs = (ros::Time::now().toSec()/1000)*1000;
+  double sec = 0;
+  int cnt = 0;
   while(ros::ok()){
     io_service.poll();
 
@@ -241,6 +247,21 @@ int main(int argc, char* argv[])
         Tb1_pub.publish(tb1_odom);
         Tb2_pub.publish(tb2_odom);
         Tb3_pub.publish(tb3_odom);
+
+        // Log turtlebot's coordination //
+        sec = (ros::Time::now().toSec()/1000)*1000;
+        cnt++;
+        if(writeFile.is_open() && cnt / 5 ==1){ //Every 0.1sec Log coordinate
+            cnt = 0;
+            writeFile << sec - default_secs<<endl;
+            writeFile << tb0_odom.posx << " " << tb0_odom.posy<<"\t"<<tb0_odom.yaw<<endl;
+            writeFile << tb1_odom.posx << " " << tb1_odom.posy<<"\t"<<tb1_odom.yaw<<endl;
+            writeFile << tb2_odom.posx << " " << tb2_odom.posy<<"\t"<<tb2_odom.yaw<<endl;
+            writeFile << tb3_odom.posx << " " << tb3_odom.posy<<"\t"<<tb3_odom.yaw<<endl;
+            if(g_mode == 4){
+                writeFile.close();
+            }
+        }
 
         // Exchange with Laplacian //
         z_ix << pk[0].stData.z_x,pk[1].stData.z_x,pk[2].stData.z_x,pk[3].stData.z_x;
